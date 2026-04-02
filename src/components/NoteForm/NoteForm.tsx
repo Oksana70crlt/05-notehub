@@ -1,4 +1,4 @@
-import { Formik } from "formik";
+import { ErrorMessage, Field, Form, Formik } from "formik";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
@@ -63,66 +63,40 @@ function NoteForm({ onCancel }: NoteFormProps) {
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
     >
-      {({
-        values,
-        errors,
-        touched,
-        handleChange,
-        handleBlur,
-        handleSubmit,
-        isValid,
-        dirty,
-      }) => (
-        <form className={css.form} onSubmit={handleSubmit}>
+      {({ isValid, dirty }) => (
+        <Form className={css.form}>
           <div className={css.formGroup}>
             <label htmlFor="title">Title</label>
-            <input
-              id="title"
-              type="text"
-              name="title"
-              className={css.input}
-              value={values.title}
-              onChange={handleChange}
-              onBlur={handleBlur}
-            />
-            <span className={css.error}>
-              {touched.title ? errors.title : ""}
-            </span>
+            <Field id="title" type="text" name="title" className={css.input} />
+            <ErrorMessage name="title" component="span" className={css.error} />
           </div>
 
           <div className={css.formGroup}>
             <label htmlFor="content">Content</label>
-            <textarea
+            <Field
+              as="textarea"
               id="content"
               name="content"
               rows={8}
               className={css.textarea}
-              value={values.content}
-              onChange={handleChange}
-              onBlur={handleBlur}
             />
-            <span className={css.error}>
-              {touched.content ? errors.content : ""}
-            </span>
+            <ErrorMessage
+              name="content"
+              component="span"
+              className={css.error}
+            />
           </div>
 
           <div className={css.formGroup}>
             <label htmlFor="tag">Tag</label>
-            <select
-              id="tag"
-              name="tag"
-              className={css.select}
-              value={values.tag}
-              onChange={handleChange}
-              onBlur={handleBlur}
-            >
+            <Field as="select" id="tag" name="tag" className={css.select}>
               <option value="Todo">Todo</option>
               <option value="Work">Work</option>
               <option value="Personal">Personal</option>
               <option value="Meeting">Meeting</option>
               <option value="Shopping">Shopping</option>
-            </select>
-            <span className={css.error}>{touched.tag ? errors.tag : ""}</span>
+            </Field>
+            <ErrorMessage name="tag" component="span" className={css.error} />
           </div>
 
           <div className={css.actions}>
@@ -142,7 +116,7 @@ function NoteForm({ onCancel }: NoteFormProps) {
               {createNoteMutation.isPending ? "Creating..." : "Create note"}
             </button>
           </div>
-        </form>
+        </Form>
       )}
     </Formik>
   );
