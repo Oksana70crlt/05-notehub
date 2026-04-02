@@ -15,15 +15,19 @@ const ReactPaginate = (
 
 // Інтерфейс для пропсів компонента Pagination
 interface PaginationProps {
-  pageTotal: number;
+  totalPages: number;
   currentPage: number;
   onPageChange: (selectedPage: number) => void;
 }
 
-function Pagination({ pageTotal, currentPage, onPageChange }: PaginationProps) {
+function Pagination({
+  totalPages,
+  currentPage,
+  onPageChange,
+}: PaginationProps) {
   return (
     <ReactPaginate
-      pageCount={pageTotal}
+      pageCount={totalPages}
       pageRangeDisplayed={5}
       marginPagesDisplayed={1}
       onPageChange={({ selected }) => onPageChange(selected + 1)}
