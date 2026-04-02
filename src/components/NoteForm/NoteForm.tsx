@@ -1,0 +1,135 @@
+import { Formik } from "formik";
+import * as Yup from "yup";
+import css from "./NoteForm.module.css";
+import type { NoteTag } from "../../types/note";
+import type { CreateNotePayload } from "../../services/noteService";
+
+// Пропси для компонента NoteForm
+interface NoteFormProps {
+  // Функція, яка буде викликана при сабміті форми з валідними даними
+  onSubmit: (values: CreateNotePayload) => void;
+  // Функція, яка буде викликана при скасуванні створення нотатки (наприклад, при закритті модалки)
+  onCancel: () => void;
+}
+//початковий стан форми та схема валідації з використанням Yup
+const initialValues: CreateNotePayload = {
+  title: "",
+  content: "",
+  tag: "Todo",
+};
+
+// Схема валідації для форми створення нотатки
+const validationSchema = Yup.object({
+  title: Yup.string()
+    .min(3, "Title must be at least 3 characters")
+    .max(50, "Title must be at most 50 characters")
+    .required("Title is required"),
+  content: Yup.string().max(500, "Content must be at most 500 characters"),
+  tag: Yup.mixed<NoteTag>()
+    .oneOf(
+      ["Todo", "Work", "Personal", "Meeting", "Shopping"],
+      "Invalid tag value",
+    )
+    .required("Tag is required"),
+});
+
+// Компонент форми для створення нотатки
+//==============================================================================
+function NoteForm({ onSubmit, onCancel }: NoteFormProps) {
+  // Функція, яка буде викликана при відправці форми з валідними даними
+  const handleSubmit = (values: CreateNotePayload): void => {
+    onSubmit(values);
+  };
+
+  return (
+    <Formik
+      initialValues={initialValues}
+      validationSchema={validationSchema}
+      onSubmit={handleSubmit}
+    >
+      {({
+        values,
+        errors,
+        touched,
+        handleChange,
+        handleBlur,
+        handleSubmit,
+        isValid,
+        dirty,
+      }) => (
+        <form className={css.form} onSubmit={handleSubmit}>
+          <div className={css.formGroup}>
+            <label htmlFor="title">Title</label>
+            <input
+              id="title"
+              type="text"
+              name="title"
+              className={css.input}
+              value={values.title}
+              onChange={handleChange}
+              onBlur={handleBlur}
+            />
+            <span className={css.error}>
+              {touched.title ? errors.title : ""}
+            </span>
+          </div>
+
+          <div className={css.formGroup}>
+            <label htmlFor="content">Content</label>
+            <textarea
+              id="content"
+              name="content"
+              rows={8}
+              className={css.textarea}
+              value={values.content}
+              onChange={handleChange}
+              onBlur={handleBlur}
+            />
+            <span className={css.error}>
+              {touched.content ? errors.content : ""}
+            </span>
+          </div>
+
+          <div className={css.formGroup}>
+            <label htmlFor="tag">Tag</label>
+            <select
+              id="tag"
+              name="tag"
+              className={css.select}
+              value={values.tag}
+              onChange={handleChange}
+              onBlur={handleBlur}
+            >
+              <option value="Todo">Todo</option>
+              <option value="Work">Work</option>
+              <option value="Personal">Personal</option>
+              <option value="Meeting">Meeting</option>
+              <option value="Shopping">Shopping</option>
+            </select>
+            <span className={css.error}>{touched.tag ? errors.tag : ""}</span>
+          </div>
+
+          <div className={css.actions}>
+            <button
+              type="button"
+              className={css.cancelButton}
+              onClick={onCancel}
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              className={css.submitButton}
+              disabled={!dirty || !isValid}
+            >
+              Create note
+            </button>
+          </div>
+        </form>
+      )}
+    </Formik>
+  );
+}
+
+export default NoteForm;
